@@ -16,17 +16,17 @@ import static org.hamcrest.Matchers.contains;
 // 3 - Classe
 public class Pet {
     // 3.1 - Atributos
-    String uri = "https://petstore.swagger.io/v2/pet"; // endereÃ§o da entidade Pet
+    String uri = "https://petstore.swagger.io/v2/pet"; // endereço da entidade Pet
 
 
 
-    //3.2 - MÃ©todos e FunÃ§Ãµes
+    //3.2 - Métodos e Funções
     public String lerJson(String caminhoJson) throws IOException {
         return new String(Files.readAllBytes(Paths.get(caminhoJson)));
     }
 
     // Incluir - Create - Post
-    @Test  // Identifica o mÃ©todo ou funÃ§Ã£o como um teste para o TestNG
+    @Test(priority = 1)  // Identifica o método ou função como um teste para o TestNG
     public void incluirPet() throws IOException {
         String jsonBody = lerJson("db/pet1.json");
 
@@ -39,7 +39,7 @@ public class Pet {
         .then()
                 .log().all()
                 .statusCode(200)
-                .body("name", is("Rintintim"))
+                .body("name", is("MeuDog"))
                 .body("status", is("available"))
                 .body("category.name", is ("dog"))
                 .body("tags.name", contains("sta"))
@@ -47,9 +47,11 @@ public class Pet {
 
     }
 
-    @Test
-    public void consultarPet(){
-        String petId = "1988090723" ;
+    @Test(priority = 2)
+    public void consultarPet() throws IOException {
+        String petId = "9223372000666028925" ;
+
+        String token =
 
         given()
                 .contentType("application/json")
@@ -61,14 +63,40 @@ public class Pet {
         .then()
                 .log().all()
                 .statusCode(200)
-                .body("name", is("Rintintim"))
-                .body("status", is("available"))
+                .body("status", is("sold"))
                 .body("category.name", is ("dog"))
                 .body("tags.name", contains("sta"))
-
-
+        .extract()
+                .path("category.name")
         ;
+        System.out.println("O token é " + token);
 
+
+
+        }
+
+
+    @Test(priority = 3)
+    public void alterarPet() throws IOException {
+
+        String jsonBody = lerJson("db/pet2.json");
+
+            given()
+                    .contentType("application/json")
+                    .log().all()
+                    .body(jsonBody)
+
+                    .when()
+                    .put(uri)
+
+                    .then()
+                    .log().all()
+                    .statusCode(200)
+                    .body("name", is("MeuDog"))
+                    .body("status", is("soldPut"))
+
+
+            ;
 
     }
 
