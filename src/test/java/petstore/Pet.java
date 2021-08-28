@@ -10,8 +10,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.everyItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.equalTo;
 
 // 3 - Classe
 public class Pet {
@@ -72,7 +74,6 @@ public class Pet {
         System.out.println("O token é " + token);
 
 
-
         }
 
 
@@ -94,7 +95,6 @@ public class Pet {
                     .statusCode(200)
                     .body("name", is("MeuDog"))
                     .body("status", is("sold"))
-
 
             ;
 
@@ -118,13 +118,27 @@ public class Pet {
                 .body("type", is("unknown"))
                 .body("message", is(petID))
 
-
-
         ;
 
 
   }
+    @Test(priority = 5)
+    public void consultarPetPorStatus(){
+        String status = "available";
+        given()
+                .contentType("application/json")
+                .log().all()
 
+        .when()
+                .get(uri + "/findByStatus?status="+ status)
+
+        .then()
+                .log().all()
+                .statusCode(200)
+                .body("name[]", everyItem(equalTo("Atena")))
+
+        ;
+    }
 
 
 }
